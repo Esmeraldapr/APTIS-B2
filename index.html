@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduQuiz — Unit 1 English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0f;
+    --surface:#13131a;
+    --surface2:#1c1c27;
+    --surface3:#252535;
+    --accent:#7c6ff7;
+    --accent2:#a78bfa;
+    --accent3:#c4b5fd;
+    --green:#22d3a4;
+    --red:#f87171;
+    --yellow:#fbbf24;
+    --text:#f0effe;
+    --text2:#a09cc4;
+    --text3:#6b678f;
+    --border:rgba(124,111,247,0.2);
+    --border2:rgba(124,111,247,0.08);
+    --glow:rgba(124,111,247,0.15);
+    --font:'Sora',sans-serif;
+    --mono:'Space Mono',monospace;
+  }
+  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+  
+  /* GRID BACKGROUND */
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,111,247,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,247,0.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+  
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100}
+  .nav-logo{font-family:var(--mono);font-size:15px;color:var(--accent);letter-spacing:0.05em}
+  .nav-logo span{color:var(--text);opacity:0.5}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .xp-badge{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--accent3);font-weight:600;font-family:var(--mono)}
+  .streak-badge{background:var(--surface2);border:1px solid rgba(251,191,36,0.3);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--yellow);font-weight:600;font-family:var(--mono)}
+  
+  /* MAIN LAYOUT */
+  .main{display:grid;grid-template-columns:280px 1fr;min-height:100vh;padding-top:56px;position:relative;z-index:1}
+  
+  /* SIDEBAR */
+  .sidebar{background:var(--surface);border-right:1px solid var(--border2);padding:20px;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px)}
+  .sidebar-section{margin-bottom:24px}
+  .sidebar-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:var(--text3);margin-bottom:12px;padding-left:4px}
+  .module-btn{width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:10px;padding:10px 12px;cursor:pointer;transition:all 0.2s;margin-bottom:4px;font-family:var(--font)}
+  .module-btn:hover{background:var(--surface2);border-color:var(--border)}
+  .module-btn.active{background:linear-gradient(135deg,rgba(124,111,247,0.2),rgba(167,139,250,0.1));border-color:var(--border);box-shadow:inset 0 0 20px rgba(124,111,247,0.05)}
+  .module-btn-label{font-size:12px;color:var(--text2);font-weight:400;margin-bottom:2px}
+  .module-btn-name{font-size:13px;color:var(--text);font-weight:500}
+  .module-btn.active .module-btn-name{color:var(--accent3)}
+  .progress-mini{width:100%;height:3px;background:var(--surface3);border-radius:3px;margin-top:6px;overflow:hidden}
+  .progress-mini-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.5s ease}
+  .progress-mini-fill.done{background:var(--green)}
+  
+  /* STATS SIDEBAR */
+  .stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface2);border-radius:8px;margin-bottom:6px}
+  .stat-label{font-size:11px;color:var(--text3);font-weight:500}
+  .stat-val{font-family:var(--mono);font-size:13px;color:var(--accent3);font-weight:700}
+  .stat-val.green{color:var(--green)}
+  .stat-val.yellow{color:var(--yellow)}
+  .stat-val.red{color:var(--red)}
+  
+  /* CONTENT */
+  .content{padding:28px 32px;max-width:760px}
+  
+  /* HEADER */
+  .unit-header{margin-bottom:28px}
+  .unit-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(124,111,247,0.1);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--accent3);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:12px}
+  .unit-tag-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  .unit-title{font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px;background:linear-gradient(135deg,var(--text),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .unit-subtitle{font-size:13px;color:var(--text2)}
+  
+  /* PROGRESS BAR */
+  .prog-container{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px 20px;margin-bottom:24px}
+  .prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .prog-label{font-size:12px;color:var(--text2);font-weight:500}
+  .prog-count{font-family:var(--mono);font-size:12px;color:var(--accent)}
+  .prog-bar{width:100%;height:8px;background:var(--surface3);border-radius:8px;overflow:hidden}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:8px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 0 12px rgba(124,111,247,0.4)}
+  .prog-segments{display:flex;gap:6px;margin-top:10px}
+  .prog-seg{display:flex;align-items:center;gap:4px;font-size:11px}
+  .prog-dot{width:8px;height:8px;border-radius:50%}
+  .prog-dot.correct{background:var(--green)}
+  .prog-dot.wrong{background:var(--red)}
+  .prog-dot.pending{background:var(--surface3)}
+  
+  /* QUESTION CARD */
+  .q-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;margin-bottom:16px;transition:all 0.3s;position:relative;overflow:hidden}
+  .q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity 0.3s}
+  .q-card.answered::before{opacity:1}
+  .q-card.correct-card{border-color:rgba(34,211,164,0.3);background:rgba(34,211,164,0.04)}
+  .q-card.wrong-card{border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04)}
+  .q-num{font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700;letter-spacing:0.1em;margin-bottom:12px}
+  .q-text{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:20px;font-weight:400}
+  .q-blank{display:inline-block;min-width:100px;border-bottom:2px solid var(--accent);color:var(--accent);font-weight:600;text-align:center;padding:0 4px;margin:0 4px;font-style:normal}
+  
+  /* TEXT MODE DROPDOWN */
+  .q-dropdown-wrap{display:inline-flex;align-items:center;margin:0 4px;position:relative}
+  .q-dropdown{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:14px;padding:4px 28px 4px 10px;cursor:pointer;outline:none;transition:all 0.2s;-webkit-appearance:none;appearance:none;min-width:140px}
+  .q-dropdown:hover,.q-dropdown:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(124,111,247,0.2)}
+  .q-dropdown.correct-sel{border-color:var(--green);color:var(--green);background:rgba(34,211,164,0.08)}
+  .q-dropdown.wrong-sel{border-color:var(--red);color:var(--red);background:rgba(248,113,113,0.08)}
+  .dropdown-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text3);font-size:10px}
+  
+  /* OPTIONS GRID */
+  .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .opt-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:12px 16px;text-align:left;cursor:pointer;transition:all 0.25s;font-family:var(--font);font-size:13px;color:var(--text2);font-weight:400;display:flex;align-items:flex-start;gap:10px;position:relative;overflow:hidden}
+  .opt-btn::before{content:'';position:absolute;inset:0;background:var(--accent);opacity:0;transition:opacity 0.2s}
+  .opt-btn:hover:not(:disabled){background:var(--surface3);border-color:var(--border);color:var(--text)}
+  .opt-btn:disabled{cursor:default}
+  .opt-letter{width:20px;height:20px;border-radius:6px;background:var(--surface3);font-size:10px;font-weight:700;font-family:var(--mono);color:var(--text3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all 0.2s}
+  .opt-btn.selected .opt-letter{background:var(--accent);color:white}
+  .opt-btn.correct-opt{border-color:rgba(34,211,164,0.5);background:rgba(34,211,164,0.08);color:var(--green)}
+  .opt-btn.correct-opt .opt-letter{background:var(--green);color:white}
+  .opt-btn.wrong-opt{border-color:rgba(248,113,113,0.5);background:rgba(248,113,113,0.08);color:var(--red)}
+  .opt-btn.wrong-opt .opt-letter{background:var(--red);color:white}
+  .opt-btn.reveal-correct{border-color:rgba(34,211,164,0.3);background:rgba(34,211,164,0.04);color:var(--green)}
+  .opt-btn.reveal-correct .opt-letter{background:rgba(34,211,164,0.3);color:var(--green)}
+  
+  /* FEEDBACK */
+  .feedback{margin-top:16px;padding:12px 16px;border-radius:10px;font-size:13px;line-height:1.6;display:none}
+  .feedback.show{display:flex;align-items:flex-start;gap:10px}
+  .feedback.correct-fb{background:rgba(34,211,164,0.1);border:1px solid rgba(34,211,164,0.2);color:var(--green)}
+  .feedback.wrong-fb{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:var(--red)}
+  .fb-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+  .fb-translation{display:block;font-size:12px;margin-top:4px;opacity:0.8}
+  
+  /* TEXT EXERCISE CARD */
+  .text-exercise{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;margin-bottom:16px}
+  .text-exercise-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .text-exercise-title::after{content:'';flex:1;height:1px;background:var(--border2)}
+  .text-body{font-size:15px;line-height:2.1;color:var(--text2);font-weight:400}
+  .text-body .inline-select{display:inline-flex;align-items:center;margin:0 3px;vertical-align:middle}
+  
+  /* CONTROLS */
+  .controls{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+  .ctrl-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 16px;cursor:pointer;font-family:var(--font);font-size:12px;color:var(--text2);font-weight:500;transition:all 0.2s;white-space:nowrap}
+  .ctrl-btn:hover{background:var(--surface2);color:var(--text);border-color:rgba(124,111,247,0.4)}
+  .ctrl-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-color:transparent;box-shadow:0 0 20px rgba(124,111,247,0.3)}
+  .ctrl-btn.primary:hover{box-shadow:0 0 30px rgba(124,111,247,0.5);transform:translateY(-1px)}
+  .ctrl-btn.danger{border-color:rgba(248,113,113,0.3);color:var(--red)}
+  .ctrl-btn.danger:hover{background:rgba(248,113,113,0.1)}
+  
+  /* RESULTS PANEL */
+  .results-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:24px;display:none}
+  .results-panel.show{display:block;animation:slideUp 0.4s cubic-bezier(0.16,1,0.3,1)}
+  @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .r-stat{background:var(--surface2);border-radius:10px;padding:14px;text-align:center}
+  .r-stat-val{font-family:var(--mono);font-size:24px;font-weight:700;margin-bottom:4px}
+  .r-stat-label{font-size:11px;color:var(--text3);font-weight:500}
+  .r-stat-val.a{color:var(--accent2)}
+  .r-stat-val.g{color:var(--green)}
+  .r-stat-val.r{color:var(--red)}
+  .r-stat-val.y{color:var(--yellow)}
+  .perf-bar-wrap{margin-bottom:16px}
+  .perf-bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px}
+  .perf-bar{height:10px;background:var(--surface3);border-radius:10px;overflow:hidden}
+  .perf-fill{height:100%;border-radius:10px;transition:width 1s ease}
+  .perf-fill.g{background:linear-gradient(90deg,#22d3a4,#4ade80)}
+  .perf-fill.r{background:linear-gradient(90deg,#f87171,#fb923c)}
+  
+  /* EMPTY STATE */
+  .empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+  .empty-icon{font-size:48px;margin-bottom:16px}
+  .empty-title{font-size:18px;font-weight:600;color:var(--text2);margin-bottom:8px}
+  .empty-sub{font-size:13px}
+  
+  /* MODAL BACKDROP for results */
+  .score-badge{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(124,111,247,0.15);color:var(--accent3);margin-left:auto}
+  
+  /* TOAST */
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font-size:13px;color:var(--text);z-index:9999;transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;display:flex;align-items:center;gap:10px}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success-t{border-color:rgba(34,211,164,0.4);background:rgba(34,211,164,0.08);color:var(--green)}
+  .toast.error-t{border-color:rgba(248,113,113,0.4);background:rgba(248,113,113,0.08);color:var(--red)}
+  
+  /* RESPONSIVE */
+  @media(max-width:900px){
+    .main{grid-template-columns:1fr}
+    .sidebar{position:relative;height:auto;top:auto;max-height:280px;border-right:none;border-bottom:1px solid var(--border2)}
+    .content{padding:20px}
+    .results-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:500px){
+    .options-grid{grid-template-columns:1fr}
+    .controls{flex-direction:column}
+  }
+  
+  /* ANIMATIONS */
+  .q-card{animation:fadeIn 0.3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+</style>
+</head>
+<body>
+ 
+<nav>
+  <div class="nav-logo">EDU<span>/</span>QUIZ</div>
+  <div class="nav-right">
+    <div class="streak-badge" id="streakBadge">🔥 0 streak</div>
+    <div class="xp-badge" id="xpBadge">✦ 0 XP</div>
+  </div>
+</nav>
+ 
+<div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Módulos</div>
+      <!-- Buttons generated by JS -->
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Rendimiento</div>
+      <div class="stat-row"><span class="stat-label">Preguntas totales</span><span class="stat-val" id="statTotal">0</span></div>
+      <div class="stat-row"><span class="stat-label">Correctas</span><span class="stat-val green" id="statCorrect">0</span></div>
+      <div class="stat-row"><span class="stat-label">Incorrectas</span><span class="stat-val red" id="statWrong">0</span></div>
+      <div class="stat-row"><span class="stat-label">Tasa de acierto</span><span class="stat-val yellow" id="statRate">—</span></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Sesión actual</div>
+      <div class="stat-row"><span class="stat-label">XP ganado</span><span class="stat-val" id="statXP" style="color:var(--accent3)">0</span></div>
+      <div class="stat-row"><span class="stat-label">Racha máx.</span><span class="stat-val yellow" id="statMaxStreak">0</span></div>
+      <div class="stat-row"><span class="stat-label">Tiempo sesión</span><span class="stat-val" id="statTime" style="color:var(--text2)">00:00</span></div>
+    </div>
+  </aside>
+  
+  <!-- CONTENT -->
+  <main class="content" id="mainContent">
+    <!-- Generated by JS -->
+  </main>
+</div>
+ 
+<div class="toast" id="toast"></div>
+ 
+<script>
+const ALL_QUESTIONS = [
+  // VOCABULARIO - UNIT 1: HOUSE - TEST 1
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"We need a comfortable _______ for the living room so I can sit and read books.",r:["armchair","balcony","bookshelf","ceiling"],c:"armchair",e:"a) sillón | b) balcón | c) biblioteca | d) techo",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Our apartment has a small _______ where we can grow some plants and look at the street.",r:["bathroom","bedroom","balcony","corridor"],c:"balcony",e:"a) baño | b) dormitorio | c) balcón | d) pasillo",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"After a long day at work, I love relaxing in a hot filled with water.",r:["bell","bin","bath","blanket"],c:"bath",e:"a) timbre | b) cubo | c) bañera | d) manta",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Don't forget to wash your hands in the _______ before dinner.",r:["bathroom","bedroom","kitchen","garage"],c:"bathroom",e:"a) baño | b) dormitorio | c) cocina | d) cochera",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"The children are sleeping upstairs in their _______.",r:["livingroom","hall","bedroom","garage"],c:"bedroom",e:"a) salón | b) entrada | c) dormitorio | d) cochera",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"I didn't hear the front door _______ because I was listening to loud music.",r:["bulb","blind","bell","cooker"],c:"bell",e:"a) bombilla | b) persiana | c) timbre | d) fuegos de la cocina",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Please throw that empty plastic bottle into the rubbish _______.",r:["chest of drawers","bin","cupboard","chimney"],c:"bin",e:"a) cómoda | b) cubo | c) armario | d) chimenea",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"It's freezing tonight, so you will need a thick _______ on your bed.",r:["cushion","curtain","blanket","sheet"],c:"blanket",e:"a) cojín | b) cortina | c) manta | d) sábana",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Pull down the _______ if the sunlight is too bright on your computer screen.",r:["wall","mirror","blind","plug"],c:"blind",e:"a) pared | b) espejo | c) persiana | d) enchufe",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"He has so many novels that he needs a bigger _______ to organize them.",r:["bookshelf","wardrobe","cooker","fridge"],c:"bookshelf",e:"a) biblioteca | b) armario de ropa | c) fuegos | d) nevera",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"The light went out because the light _______ in the kitchen burned out.",r:["plug","tap","bulb","mirror"],c:"bulb",e:"a) enchufe | b) grifo | c) bombilla | d) espejo",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Look up! There is a beautiful vintage lamp hanging from the _______.",r:["ground floor","second floor","ceiling","stairs"],c:"ceiling",e:"a) planta baja | b) segunda planta | c) techo | d) escaleras",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"It's warm inside the house during winter thanks to the _______.",r:["central heating","frying pan","hairdryer","microwave"],c:"central heating",e:"a) calefacción central | b) sartén | c) secador | d) microondas",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"I keep my socks, t-shirts, and underwear inside the _______ in my bedroom.",r:["cupboard","chest of drawers","sink","dishwasher"],c:"chest of drawers",e:"a) armario | b) cómoda | c) fregadero | d) lavavajillas",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Smoke was coming out of the cottage _______ as they lit the fireplace.",r:["corridor","chimney","garage","garden"],c:"chimney",e:"a) pasillo | b) chimenea | c) cochera | d) jardín",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"I spent the whole morning doing the _______ because the house was a mess.",r:["cleaning","furniture","corridor","downstairs"],c:"cleaning",e:"a) limpieza | b) muebles | c) pasillo | d) planta de abajo",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Be careful not to touch the hot plates on the electric _______ while preparing food.",r:["kettle","cooker","freezer","washing machine"],c:"cooker",e:"a) tetera | b) fuegos | c) congelador | d) lavadora",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Walk straight down this long _______ and the restroom will be the last door on your left.",r:["balcony","corridor","garden","stairs"],c:"corridor",e:"a) balcón | b) pasillo | c) jardín | d) escaleras",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 1",p:"Put the cereal boxes back into the kitchen _______ after you finish breakfast.",r:["wardrobe","chest of drawers","cupboard","bookshelf"],c:"cupboard",e:"a) armario de ropa | b) cómoda | c) armario | d) biblioteca",mode:"mcq"},
+  // TEST 2
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"This sofa is a bit hard; I think it needs a soft _______ behind my back.",r:["cushion","blanket","sheet","pillow"],c:"cushion",e:"a) cojín | b) manta | c) sábana | d) almohada",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"We always gather at the big wooden table in the _______ to have family dinners.",r:["bathroom","bedroom","dining room","lavatory"],c:"dining room",e:"a) baño | b) dormitorio | c) comedor | d) cuarto de baño",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"Don't wash the plates by hand; just put them inside the automatic _______.",r:["washing machine","dishwasher","cooker","microwave"],c:"dishwasher",e:"a) lavadora | b) lavavajillas | c) fuegos | d) microondas",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"Instead of a heavy blanket, I prefer using a warm _______ inside a cover during winter.",r:["duvet","sheet","pillow","towel"],c:"duvet",e:"a) edredón | b) sábana | c) almohada | d) toalla",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"Store the meat and ice cream in the _______ so they stay completely frozen.",r:["fridge","freezer","cupboard","cooker"],c:"freezer",e:"a) nevera | b) congelador | c) armario | d) fuegos",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"Please put the milk, tomatoes, and yogurt back into the cold _______.",r:["freezer","cupboard","fridge","microwave"],c:"fridge",e:"a) congelador | b) armario | c) nevera | d) microondas",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"To make an omelet, you need to heat some oil in a good quality _______.",r:["kettle","dish","sink","frying pan"],c:"frying pan",e:"a) tetera | b) plato | c) fregadero | d) sartén",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"Keep your car inside the _______ during the night so it doesn't get wet from the rain.",r:["hall","balcony","garage","corridor"],c:"garage",e:"a) entrada | b) balcón | c) cochera | d) pasillo",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"We have a big backyard _______ with beautiful green grass and colorful flowers.",r:["ceiling","garden","hall","lavatory"],c:"garden",e:"a) techo | b) jardín | c) entrada | d) cuarto de baño",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"My hair is soaking wet; can I borrow your _______ for a couple of minutes?",r:["washing machine","microwave","hairdryer","kettle"],c:"hairdryer",e:"a) lavadora | b) microondas | c) secador | d) tetera",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"Leave your wet umbrella and your heavy coat in the _______ before entering the saloon.",r:["corridor","hall","bedroom","kitchen"],c:"hall",e:"a) pasillo | b) entrada | c) dormitorio | d) cocina",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"Fill the electric _______ with fresh water to prepare a hot cup of English tea.",r:["frying pan","sink","dish","kettle"],c:"kettle",e:"a) sartén | b) fregadero | c) plato | d) tetera",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"The house has a modern _______ equipped with a fridge, a cooker, and a dishwasher.",r:["dining room","bathroom","kitchen","livingroom"],c:"kitchen",e:"a) comedor | b) baño | c) cocina | d) salón",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 2",p:"Our family usually sits together in the spacious _______ to watch television on the sofa.",r:["hall","livingroom","kitchen","dining room"],c:"livingroom",e:"a) entrada | b) salón | c) cocina | d) comedor",mode:"mcq"},
+  // TEST 3
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"It only takes two minutes to heat up your leftover soup in the _______.",r:["cooker","fridge","microwave","kettle"],c:"microwave",e:"a) fuegos | b) nevera | c) microondas | d) tetera",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"I can't sleep without a soft _______ under my head to support my neck.",r:["cushion","pillow","sheet","blanket"],c:"pillow",e:"a) cojín | b) almohada | c) sábana | d) manta",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"We placed a beautiful woolen _______ on the cold wooden floor in front of the fireplace.",r:["sheet","pillow","rug / carpet","towel"],c:"rug / carpet",e:"a) sábana | b) almohada | c) alfombra | d) toalla",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"The dirty dishes are stacking up in the kitchen _______; please wash them.",r:["bath","dish","sink","lavatory"],c:"sink",e:"a) bañera | b) plato | c) fregadero | d) cuarto de baño",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"The elevator is broken, so we will have to walk up the _______ to the third floor.",r:["corridor","balcony","stairs","hall"],c:"stairs",e:"a) pasillo | b) balcón | c) escaleras | d) entrada",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"Turn off the water _______ while soaping your face to avoid wasting water.",r:["plug","bulb","tap","sink"],c:"tap",e:"a) enchufe | b) bombilla | c) grifo | d) fregadero",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"Please flush the _______ after you use it and wash your hands.",r:["toilet","bath","sink","dishwasher"],c:"toilet",e:"a) inodoro | b) bañera | c) fregadero | d) lavavajillas",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"Dry your body with a clean cotton _______ after you get out of the shower.",r:["sheet","pillow","blanket","towel"],c:"towel",e:"a) sábana | b) almohada | c) manta | d) toalla",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"We hung a colorful modern painting on the living room _______.",r:["ceiling","floor","wall","blind"],c:"wall",e:"a) techo | b) suelo | c) pared | d) persiana",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"Hang your suits, coats, and jackets neatly inside the bedroom _______.",r:["bookshelf","wardrobe","cupboard","chest of drawers"],c:"wardrobe",e:"a) biblioteca | b) armario de ropa | c) armario | d) cómoda",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: House",u:"TEST 3",p:"Put the dirty clothes inside the _______ and add some detergent.",r:["dishwasher","microwave","washing machine","fridge"],c:"washing machine",e:"a) lavavajillas | b) microondas | c) lavadora | d) nevera",mode:"mcq"},
+  // HABITS TEST 1
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"Every morning, I go to the bathroom to brush my _______ and wash my face.",r:["brush your teeth","chat online","check social media","get up"],c:"brush your teeth",e:"a) lavarse los dientes | b) chatear | c) redes sociales | d) levantarse",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"I often spend an hour in the evening to _______ with my friends on WhatsApp.",r:["cook a meal","get home","chat online","study"],c:"chat online",e:"a) cocinar | b) llegar a casa | c) chatear | d) estudiar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"The first thing she does after waking up is to _______ to see her notifications.",r:["have a shower","check social media","tidy your room","work"],c:"check social media",e:"a) ducharse | b) redes sociales | c) limpiar | d) trabajar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"My father loves to _______ delicious Italian dishes for the whole family on Sundays.",r:["read","stay in","wake up","cook"],c:"cook",e:"a) leer | b) quedarse | c) despertarse | d) cocinar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"I usually _______ around 5:00 PM, and then I finally take the bus to go back home.",r:["go to work/school","get up","finish work/school","have breakfast"],c:"finish work/school",e:"a) ir al trabajo | b) levantarse | c) terminar | d) desayunar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"I am always exhausted when I _______ after a long traffic jam in the city center.",r:["get home","have lunch","put on some make-up","watch TV"],c:"get home",e:"a) llegar a casa | b) almorzar | c) maquillaje | d) ver la tele",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"On weekends, I don't need to _______ early; I can stay in bed until noon.",r:["send text messages","tidy your room","get up","have dinner"],c:"get up",e:"a) mensajes | b) limpiar | c) levantarse | d) cenar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"I have to wake up at 7:00 AM because I _______ at 8:30 AM every weekday.",r:["stay in","go to work/school","have a coffee/drink","chat online"],c:"go to work/school",e:"a) quedarse | b) ir al trabajo | c) café | d) chatear",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"On Friday nights, I like to relax and _______ with hot water, candles, and soft music.",r:["have a bath","check social media","wake up","work"],c:"have a bath",e:"a) darse un baño | b) redes sociales | c) despertarse | d) trabajar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"I prefer to _______ in the morning because it wakes me up instantly before going out.",r:["have a shower","cook a meal","text people","stay in"],c:"have a shower",e:"a) ducharse | b) cocinar | c) mensajes | d) quedarse",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 1",p:"I always _______ like eggs and toast; it gives me energy for the entire day.",r:["have breakfast","have lunch","have dinner","read"],c:"have breakfast",e:"a) desayunar | b) almorzar | c) cenar | d) leer",mode:"mcq"},
+  // HABITS TEST 2
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"We usually _______ at 9:00 PM, which is quite late compared to other European countries.",r:["have lunch","have dinner","have breakfast","get up"],c:"have dinner",e:"a) almorzar | b) cenar | c) desayunar | d) levantarse",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"At noon, the employees leave the office for an hour to _______ at the local restaurant.",r:["have lunch","cook","get home","have a bath"],c:"have lunch",e:"a) almorzar | b) cocinar | c) llegar | d) baño",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"Before going out to the party, she needs twenty minutes to _______ in front of the mirror.",r:["tidy your room","check social media","put on some make-up","study"],c:"put on some make-up",e:"a) limpiar | b) redes | c) maquillaje | d) estudiar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"Instead of calling, I prefer to _______ using applications like Messenger or iMessage.",r:["cook a meal","send text messages","have a shower","stay in"],c:"send text messages",e:"a) cocinar | b) mensajes | c) ducharse | d) quedarse",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"It's raining outside and I'm very tired, so I think I will _______ tonight and watch a movie.",r:["go to work/school","finish work/school","stay in","have a coffee"],c:"stay in",e:"a) trabajo | b) terminar | c) quedarse en casa | d) café",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"I need to _______ hard tonight because I have a very difficult English exam tomorrow morning.",r:["study","wake up","cook","read"],c:"study",e:"a) estudiar | b) despertarse | c) cocinar | d) leer",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"Your clothes are all over the floor! You must _______ before your guests arrive.",r:["have breakfast","put on some make-up","tidy your room","stay in"],c:"tidy your room",e:"a) desayunar | b) maquillaje | c) limpiar | d) quedarse",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"My alarm rings at 6:30 AM, but I usually _______ five minutes before it goes off.",r:["wake up","finish work/school","have a shower","work"],c:"wake up",e:"a) despertarse | b) terminar | c) ducharse | d) trabajar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"We like to relax on the couch and _______ on Netflix after a tiring day.",r:["cook a meal","brush your teeth","watch TV/a film/a series","have a bath"],c:"watch TV/a film/a series",e:"a) cocinar | b) dientes | c) ver la tele | d) baño",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Habits",u:"TEST 2",p:"Many people now have the opportunity to _______ from home using a computer.",r:["work","get up","go to work/school","send text messages"],c:"work",e:"a) trabajar | b) levantarse | c) ir | d) mensajes",mode:"mcq"},
+  // MISCELANEOUS TEST 1
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 1",p:"The project is _______ finished; we just need to review the final details tonight.",r:["almost","cool","cosy","tiny"],c:"almost",e:"a) casi | b) fresco | c) acogedor | d) pequeño",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 1",p:"The primitive tribes used to live inside a deep white _______ to protect themselves from wild animals.",r:["cottage","countryside","cave","design"],c:"cave",e:"a) cortijo | b) campo | c) cueva | d) diseño",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 1",p:"It's a bit _______ outside this evening, so make sure to bring a light jacket with you.",r:["tidy","tiny","nowadays","cool"],c:"cool",e:"a) ordenado | b) pequeño | c) actualmente | d) fresco",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 1",p:"I love this wooden cabin; the fireplace makes the living room feel incredibly warm and _______.",r:["cosy","almost","sunshine","make-up"],c:"cosy",e:"a) acogedor | b) casi | c) sol | d) maquillaje",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 1",p:"I prefer living in the peaceful _______ rather than staying in a noisy, polluted city.",r:["countryside","cottage","cave","nowadays"],c:"countryside",e:"a) campo | b) cortijo | c) cueva | d) actualmente",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 1",p:"Your bedroom looks very neat and _______; thank you for putting your clothes away.",r:["tiny","cool","cosy","tidy"],c:"tidy",e:"a) pequeño | b) fresco | c) acogedor | d) ordenado",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 1",p:"The apartment is absolutely _______; there is barely enough space for a small bed and a desk.",r:["tiny","almost","cool","tidy"],c:"tiny",e:"a) pequeño | b) casi | c) fresco | d) ordenado",mode:"mcq"},
+  // MISCELANEOUS TEST 2
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 2",p:"I often _______ about traveling around the world and visiting ancient monuments.",r:["to dream","to matter","to include","to remain"],c:"to dream",e:"a) soñar | b) importar | c) incluir | d) permanecer",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 2",p:"Please write down the password on a piece of paper so you don't _______ it.",r:["to remember","to forget","to improve","to guess"],c:"to forget",e:"a) recordar | b) olvidar | c) mejorar | d) adivinar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 2",p:"What does this specific phrasal verb _______? I cannot find it in my dictionary.",r:["to forget","to guess","to mean","to remember"],c:"to mean",e:"a) olvidar | b) adivinar | c) significar | d) recordar",mode:"mcq"},
+  {m:"VOCABULARIO",t:"Unit 1: Miscelaneous",u:"TEST 2",p:"I can clearly _______ my first day of primary school; I was very nervous.",r:["to forget","to guess","to mean","to remember"],c:"to remember",e:"a) olvidar | b) adivinar | c) significar | d) recordar",mode:"mcq"},
+  // EXERCISE 3 - TEXT MODE
+  {m:"EJERCICIOS",t:"Unit 1: Routine",u:"Exercise 3",mode:"text",
+   segments:[
+     {type:"text",content:"I'm Mario and this is my daily routine. I usually "},
+     {type:"drop",id:"d1",c:"get up",opts:["get up","wake up","go to bed","stay in"]},
+     {type:"text",content:" every day at around 7 o'clock, later I "},
+     {type:"drop",id:"d2",c:"have a shower",opts:["have a shower","have a bath","brush my teeth","get dressed"]},
+     {type:"text",content:" and get dressed. After that I go downstairs to the kitchen to "},
+     {type:"drop",id:"d3",c:"have breakfast",opts:["have breakfast","have lunch","have dinner","cook a meal"]},
+     {type:"text",content:" with my family. I always have some milk and a piece of fruit. I "},
+     {type:"drop",id:"d4",c:"go to school",opts:["go to school","finish school","get home","stay in"]},
+     {type:"text",content:" by bus, but on Fridays, my father drives me because I have to bring my cello. At 2:30 p.m. I "},
+     {type:"drop",id:"d5",c:"finish school",opts:["finish school","go to school","have lunch","get home"]},
+     {type:"text",content:" and I "},
+     {type:"drop",id:"d6",c:"get home",opts:["get home","go out","stay in","finish work"]},
+     {type:"text",content:" at around 2:45. We "},
+     {type:"drop",id:"d7",c:"have lunch",opts:["have lunch","have dinner","have breakfast","cook"]},
+     {type:"text",content:" all together in the dining room and then I always do my homework. In the afternoon I go to football practice or to Spanish lessons. We hardly ever "},
+     {type:"drop",id:"d8",c:"have dinner",opts:["have dinner","have lunch","have breakfast","cook a meal"]},
+     {type:"text",content:" together because my mum is a nurse and she works late in the hospital so my dad has to cook dinner almost every day. After that we usually "},
+     {type:"drop",id:"d9",c:"watch",opts:["watch","read","study","chat online"]},
+     {type:"text",content:" a film or a series in the living room. Finally, I "},
+     {type:"drop",id:"d10",c:"go to bed",opts:["go to bed","wake up","get up","finish work"]},
+     {type:"text",content:" at around 11 in the evening."}
+   ]
+  }
+];
+ 
+// ---- STATE ----
+let state = {
+  xp: 0,
+  streak: 0,
+  maxStreak: 0,
+  totalAnswered: 0,
+  totalCorrect: 0,
+  sessionStart: Date.now(),
+  moduleProgress: {},  // key -> {answered, correct}
+  questionStates: {}   // "moduleKey_qIdx" -> {answered, correct, selected}
+};
+ 
+// Group questions by module+topic+unit
+function getModuleKey(q){ return q.m + '||' + q.t + '||' + q.u; }
+function getModuleLabel(q){ return q.t + ' — ' + q.u; }
+function getModuleGroup(q){ return q.m; }
+ 
+let modules = {};
+ALL_QUESTIONS.forEach((q,i)=>{
+  const key = getModuleKey(q);
+  if(!modules[key]) modules[key] = {key, label:getModuleLabel(q), group:getModuleGroup(q), questions:[], indices:[]};
+  modules[key].questions.push(q);
+  modules[key].indices.push(i);
+});
+const moduleKeys = Object.keys(modules);
+let currentModule = moduleKeys[0];
+ 
+function initModuleProgress(){
+  moduleKeys.forEach(k=>{
+    if(!state.moduleProgress[k]) state.moduleProgress[k]={answered:0,correct:0};
+  });
+}
+initModuleProgress();
+ 
+// ---- TIMER ----
+setInterval(()=>{
+  const s = Math.floor((Date.now()-state.sessionStart)/1000);
+  const m = Math.floor(s/60).toString().padStart(2,'0');
+  const sec = (s%60).toString().padStart(2,'0');
+  document.getElementById('statTime').textContent = m+':'+sec;
+},1000);
+ 
+// ---- SIDEBAR ----
+function renderSidebar(){
+  const sec = document.querySelector('.sidebar-section');
+  const title = sec.querySelector('.sidebar-title');
+  sec.innerHTML = '';
+  sec.appendChild(title);
+  
+  const groups = {};
+  moduleKeys.forEach(k=>{
+    const g = modules[k].group;
+    if(!groups[g]) groups[g]=[];
+    groups[g].push(k);
+  });
+  
+  Object.entries(groups).forEach(([group,keys])=>{
+    const groupEl = document.createElement('div');
+    groupEl.style.cssText='font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--text3);padding:8px 4px 4px;';
+    groupEl.textContent = group;
+    sec.appendChild(groupEl);
+    keys.forEach(k=>{
+      const mod = modules[k];
+      const prog = state.moduleProgress[k]||{answered:0,correct:0};
+      const total = mod.questions.length;
+      const pct = total>0 ? Math.round(prog.answered/total*100) : 0;
+      const done = prog.answered>=total;
+      const btn = document.createElement('button');
+      btn.className = 'module-btn' + (k===currentModule?' active':'');
+      btn.dataset.key = k;
+      const rate = prog.answered>0 ? Math.round(prog.correct/prog.answered*100) : null;
+      btn.innerHTML = `
+        <div class="module-btn-label">${mod.questions.length} preguntas${rate!==null?' · '+rate+'% ✓':''}</div>
+        <div class="module-btn-name">${mod.label}</div>
+        <div class="progress-mini"><div class="progress-mini-fill${done?' done':''}" style="width:${pct}%"></div></div>
+      `;
+      btn.addEventListener('click',()=>{ currentModule=k; renderSidebar(); renderContent(); });
+      sec.appendChild(btn);
+    });
+  });
+}
+ 
+function updateStats(){
+  const total = state.totalAnswered;
+  const correct = state.totalCorrect;
+  const wrong = total - correct;
+  const rate = total>0 ? Math.round(correct/total*100)+'%' : '—';
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statCorrect').textContent = correct;
+  document.getElementById('statWrong').textContent = wrong;
+  document.getElementById('statRate').textContent = rate;
+  document.getElementById('statXP').textContent = state.xp;
+  document.getElementById('statMaxStreak').textContent = state.maxStreak;
+  document.getElementById('xpBadge').textContent = '✦ '+state.xp+' XP';
+  document.getElementById('streakBadge').textContent = '🔥 '+state.streak+' racha';
+}
+ 
+// ---- CONTENT RENDER ----
+function renderContent(){
+  const content = document.getElementById('mainContent');
+  const mod = modules[currentModule];
+  const prog = state.moduleProgress[currentModule]||{answered:0,correct:0};
+  const total = mod.questions.length;
+  const pct = total>0 ? Math.round(prog.answered/total*100) : 0;
+  
+  // Check if text mode
+  const isText = mod.questions.some(q=>q.mode==='text');
+  
+  let html = `
+    <div class="unit-header">
+      <div class="unit-tag"><span class="unit-tag-dot"></span>${mod.group}</div>
+      <div class="unit-title">${mod.label}</div>
+      <div class="unit-subtitle">${total} preguntas · ${mod.group}</div>
+    </div>
+    <div class="prog-container">
+      <div class="prog-header">
+        <span class="prog-label">Progreso del módulo</span>
+        <span class="prog-count">${prog.answered} / ${total} respondidas · ${prog.correct} correctas</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:${pct}%"></div></div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--green)">✓ ${prog.correct} correctas</span>
+        <span style="font-size:11px;color:var(--red)">✗ ${prog.answered-prog.correct} incorrectas</span>
+        <span style="font-size:11px;color:var(--text3)">${total-prog.answered} pendientes</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn primary" onclick="checkAllAndShowResults()">Ver resultados</button>
+      <button class="ctrl-btn" onclick="resetModule()">↺ Reiniciar módulo</button>
+      <button class="ctrl-btn" onclick="revealAll()">👁 Mostrar todas</button>
+    </div>
+    <div class="results-panel" id="resultsPanel"></div>
+  `;
+  
+  if(isText){
+    html += renderTextExercise(mod.questions.find(q=>q.mode==='text'));
+  } else {
+    mod.questions.forEach((q,i)=>{
+      html += renderMCQ(q, i, currentModule);
+    });
+  }
+  
+  content.innerHTML = html;
+  
+  // Attach dropdown listeners for text mode
+  if(isText){
+    content.querySelectorAll('.q-dropdown').forEach(sel=>{
+      sel.addEventListener('change', function(){
+        handleDropdownChange(this, currentModule);
+      });
+    });
+  }
+}
+ 
+function renderTextExercise(q){
+  let html = `<div class="text-exercise" id="textEx">
+    <div class="text-exercise-title">Ejercicio — Rellena los huecos</div>
+    <div class="text-body" id="textBody">`;
+  
+  q.segments.forEach(seg=>{
+    if(seg.type==='text'){
+      html += seg.content.replace(/\n/g,'<br>');
+    } else {
+      const state_key = currentModule+'_text_'+seg.id;
+      const s = state.questionStates[state_key];
+      const answered = s && s.answered;
+      const correct = s && s.correct;
+      let cls = '';
+      if(answered && correct) cls='correct-sel';
+      else if(answered && !correct) cls='wrong-sel';
+      html += `<span class="q-dropdown-wrap">
+        <select class="q-dropdown ${cls}" data-id="${seg.id}" data-correct="${seg.c}" ${answered?'disabled':''}>
+          <option value="">— elegir —</option>
+          ${seg.opts.map(o=>`<option value="${o}" ${(s&&s.selected===o)?'selected':''}>${o}</option>`).join('')}
+        </select>
+        <span class="dropdown-arrow">▾</span>
+      </span>`;
+    }
+  });
+  
+  html += `</div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border2);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text3)">Cada hueco vale 10 XP</span>
+      <button class="ctrl-btn" onclick="checkTextExercise()" style="margin-left:auto">Comprobar todos</button>
+      <button class="ctrl-btn danger" onclick="resetTextExercise()">Reiniciar</button>
+    </div>
+  </div>`;
+  return html;
+}
+ 
+function handleDropdownChange(sel, modKey){
+  const id = sel.dataset.id;
+  const correct = sel.dataset.correct;
+  const val = sel.value;
+  if(!val) return;
+  const state_key = modKey+'_text_'+id;
+  const isCorrect = val.trim().toLowerCase() === correct.trim().toLowerCase();
+  state.questionStates[state_key] = {answered:true, correct:isCorrect, selected:val};
+  sel.disabled = true;
+  sel.className = 'q-dropdown ' + (isCorrect?'correct-sel':'wrong-sel');
+  if(isCorrect){
+    state.xp += 10;
+    state.streak++;
+    if(state.streak>state.maxStreak) state.maxStreak = state.streak;
+    showToast('✓ ¡Correcto! +10 XP','success-t');
+  } else {
+    state.streak = 0;
+    showToast('✗ Era: ' + correct,'error-t');
+  }
+  
+  // Update module progress
+  const mod = modules[modKey];
+  const textQ = mod.questions.find(q=>q.mode==='text');
+  let answered = 0, correct2 = 0;
+  textQ.segments.filter(s=>s.type==='drop').forEach(s=>{
+    const sk = modKey+'_text_'+s.id;
+    if(state.questionStates[sk]&&state.questionStates[sk].answered){
+      answered++;
+      if(state.questionStates[sk].correct) correct2++;
+    }
+  });
+  state.moduleProgress[modKey] = {answered, correct: correct2};
+  
+  // Don't re-render, just update stats
+  state.totalAnswered = Object.values(state.questionStates).filter(s=>s.answered).length;
+  state.totalCorrect = Object.values(state.questionStates).filter(s=>s.answered&&s.correct).length;
+  updateStats();
+  renderSidebar();
+  
+  // Update progress bar
+  const total = textQ.segments.filter(s=>s.type==='drop').length;
+  const pct = total>0 ? Math.round(answered/total*100) : 0;
+  const pf = document.getElementById('progFill');
+  if(pf) pf.style.width = pct+'%';
+  const pc = document.querySelector('.prog-count');
+  if(pc) pc.textContent = answered+' / '+total+' respondidas · '+correct2+' correctas';
+}
+ 
+function checkTextExercise(){
+  document.querySelectorAll('.q-dropdown:not(:disabled)').forEach(sel=>{
+    if(sel.value){
+      handleDropdownChange(sel, currentModule);
+    }
+  });
+}
+function resetTextExercise(){
+  const mod = modules[currentModule];
+  const textQ = mod.questions.find(q=>q.mode==='text');
+  textQ.segments.filter(s=>s.type==='drop').forEach(s=>{
+    delete state.questionStates[currentModule+'_text_'+s.id];
+  });
+  state.moduleProgress[currentModule] = {answered:0,correct:0};
+  renderContent();
+  renderSidebar();
+  updateStats();
+}
+ 
+function renderMCQ(q, idx, modKey){
+  const state_key = modKey+'_'+idx;
+  const s = state.questionStates[state_key];
+  const answered = s && s.answered;
+  const letters = ['A','B','C','D'];
+  
+  let cardCls = 'q-card';
+  if(answered) cardCls += ' answered '+(s.correct?'correct-card':'wrong-card');
+  
+  const promptHtml = q.p.replace('_______','<em class="q-blank">_______</em>');
+  
+  let optionsHtml = '<div class="options-grid">';
+  q.r.forEach((opt,oi)=>{
+    let cls = 'opt-btn';
+    if(answered){
+      if(opt===q.c && s.selected===opt) cls+=' correct-opt';
+      else if(opt===q.c) cls+=' reveal-correct';
+      else if(s.selected===opt && opt!==q.c) cls+=' wrong-opt';
+    }
+    const disabled = answered ? 'disabled' : '';
+    optionsHtml += `<button class="${cls}" ${disabled} onclick="answerMCQ('${modKey}',${idx},'${opt.replace(/'/g,"\\'")}')">
+      <span class="opt-letter">${letters[oi]}</span>
+      <span>${opt}</span>
+    </button>`;
+  });
+  optionsHtml += '</div>';
+  
+  let feedbackHtml = '';
+  if(answered){
+    const fbCls = s.correct ? 'feedback show correct-fb' : 'feedback show wrong-fb';
+    const fbIcon = s.correct ? '✓' : '✗';
+    const fbMsg = s.correct ? '¡Correcto!' : `Incorrecto. La respuesta es: <strong>${q.c}</strong>`;
+    feedbackHtml = `<div class="${fbCls}"><span class="fb-icon">${fbIcon}</span><div>${fbMsg}<span class="fb-translation">${q.e}</span></div></div>`;
+  }
+  
+  return `<div class="${cardCls}" id="qcard_${modKey.replace(/[^a-z0-9]/gi,'_')}_${idx}">
+    <div class="q-num">PREGUNTA ${idx+1} / ${modules[modKey].questions.length}</div>
+    <div class="q-text">${promptHtml}</div>
+    ${optionsHtml}
+    ${feedbackHtml}
+  </div>`;
+}
+ 
+function answerMCQ(modKey, idx, selected){
+  const q = modules[modKey].questions[idx];
+  const state_key = modKey+'_'+idx;
+  if(state.questionStates[state_key]&&state.questionStates[state_key].answered) return;
+  
+  const isCorrect = selected.trim().toLowerCase() === q.c.trim().toLowerCase();
+  state.questionStates[state_key] = {answered:true, correct:isCorrect, selected};
+  
+  if(isCorrect){
+    state.xp += 10;
+    state.streak++;
+    if(state.streak>state.maxStreak) state.maxStreak = state.streak;
+    showToast('✓ ¡Correcto! +10 XP','success-t');
+  } else {
+    state.streak = 0;
+    showToast('✗ Era: '+q.c,'error-t');
+  }
+  
+  // Update module progress
+  const mod = modules[modKey];
+  let answered=0, correct=0;
+  mod.questions.forEach((q2,i2)=>{
+    const sk = modKey+'_'+i2;
+    if(state.questionStates[sk]&&state.questionStates[sk].answered){
+      answered++;
+      if(state.questionStates[sk].correct) correct++;
+    }
+  });
+  state.moduleProgress[modKey] = {answered, correct};
+  
+  state.totalAnswered = Object.values(state.questionStates).filter(s=>s.answered).length;
+  state.totalCorrect = Object.values(state.questionStates).filter(s=>s.answered&&s.correct).length;
+  
+  updateStats();
+  renderSidebar();
+  
+  // Re-render just the card
+  const cardId = 'qcard_'+modKey.replace(/[^a-z0-9]/gi,'_')+'_'+idx;
+  const el = document.getElementById(cardId);
+  if(el){
+    el.outerHTML = renderMCQ(q, idx, modKey);
+  }
+  
+  // Update progress
+  const total = mod.questions.length;
+  const pct = total>0 ? Math.round(answered/total*100) : 0;
+  const pf = document.getElementById('progFill');
+  if(pf) pf.style.width = pct+'%';
+  const pc = document.querySelector('.prog-count');
+  if(pc) pc.textContent = answered+' / '+total+' respondidas · '+correct+' correctas';
+}
+ 
+function resetModule(){
+  const mod = modules[currentModule];
+  mod.questions.forEach((q,i)=>{
+    delete state.questionStates[currentModule+'_'+i];
+  });
+  // also text
+  mod.questions.filter(q=>q.mode==='text').forEach(q=>{
+    q.segments.filter(s=>s.type==='drop').forEach(s=>{
+      delete state.questionStates[currentModule+'_text_'+s.id];
+    });
+  });
+  state.moduleProgress[currentModule] = {answered:0,correct:0};
+  state.totalAnswered = Object.values(state.questionStates).filter(s=>s.answered).length;
+  state.totalCorrect = Object.values(state.questionStates).filter(s=>s.answered&&s.correct).length;
+  updateStats();
+  renderSidebar();
+  renderContent();
+  showToast('Módulo reiniciado','');
+}
+ 
+function revealAll(){
+  const mod = modules[currentModule];
+  mod.questions.filter(q=>q.mode!=='text').forEach((q,i)=>{
+    const sk = currentModule+'_'+i;
+    if(!state.questionStates[sk]||!state.questionStates[sk].answered){
+      state.questionStates[sk] = {answered:true,correct:false,selected:'__revealed__'};
+    }
+  });
+  let answered=0,correct=0;
+  mod.questions.forEach((q,i)=>{
+    const sk = currentModule+'_'+i;
+    if(state.questionStates[sk]&&state.questionStates[sk].answered){answered++;if(state.questionStates[sk].correct)correct++;}
+  });
+  state.moduleProgress[currentModule]={answered,correct};
+  state.totalAnswered = Object.values(state.questionStates).filter(s=>s.answered).length;
+  state.totalCorrect = Object.values(state.questionStates).filter(s=>s.answered&&s.correct).length;
+  updateStats();
+  renderSidebar();
+  renderContent();
+}
+ 
+function checkAllAndShowResults(){
+  const mod = modules[currentModule];
+  const prog = state.moduleProgress[currentModule]||{answered:0,correct:0};
+  const total = mod.questions.length;
+  const wrong = prog.answered - prog.correct;
+  const rate = prog.answered>0 ? Math.round(prog.correct/prog.answered*100) : 0;
+  
+  let grade = '—';
+  if(prog.answered>0){
+    if(rate>=90) grade = '🏆 Excelente';
+    else if(rate>=70) grade = '✓ Bien';
+    else if(rate>=50) grade = '~ Mejorable';
+    else grade = '✗ Repasar';
+  }
+  
+  const panel = document.getElementById('resultsPanel');
+  panel.className = 'results-panel show';
+  panel.innerHTML = `
+    <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      Resultados del módulo
+      <span style="background:rgba(124,111,247,0.15);color:var(--accent3);font-size:11px;padding:2px 8px;border-radius:6px;font-family:var(--mono)">${grade}</span>
+    </div>
+    <div class="results-grid">
+      <div class="r-stat"><div class="r-stat-val a">${prog.answered}</div><div class="r-stat-label">Respondidas</div></div>
+      <div class="r-stat"><div class="r-stat-val g">${prog.correct}</div><div class="r-stat-label">Correctas</div></div>
+      <div class="r-stat"><div class="r-stat-val r">${wrong}</div><div class="r-stat-label">Incorrectas</div></div>
+      <div class="r-stat"><div class="r-stat-val y">${rate}%</div><div class="r-stat-label">Precisión</div></div>
+    </div>
+    <div class="perf-bar-wrap">
+      <div class="perf-bar-label"><span>Correctas</span><span>${prog.correct} / ${total}</span></div>
+      <div class="perf-bar"><div class="perf-fill g" style="width:${total>0?Math.round(prog.correct/total*100):0}%"></div></div>
+    </div>
+    <div class="perf-bar-wrap">
+      <div class="perf-bar-label"><span>Incorrectas</span><span>${wrong} / ${total}</span></div>
+      <div class="perf-bar"><div class="perf-fill r" style="width:${total>0?Math.round(wrong/total*100):0}%"></div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-top:8px">XP total ganado en esta sesión: <span style="color:var(--accent3);font-family:var(--mono);font-weight:700">${state.xp}</span></div>
+  `;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+ 
+// ---- TOAST ----
+let toastTimer;
+function showToast(msg, cls){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + cls;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.className='toast'; },2000);
+}
+ 
+// ---- INIT ----
+renderSidebar();
+renderContent();
+updateStats();
+</script>
+</body>
+</html>
